@@ -1,0 +1,16 @@
+<%-include('Header.ejs')-%>
+    <div class="container">
+        <%allblogs.forEach((blog)=>{%>
+            <div class="jumbotron">
+                <h2>
+                    <%= blog.title%>
+                </h2>
+                <p>
+                    <%=blog.content%>
+                </p>
+            </div>
+
+            <%})%>
+
+    </div>
+    <%-include('Footer.ejs')-%>
