@@ -1,7 +1,41 @@
 <%-include("Header.ejs")-%>
 
-    <div class="cont">
-        <h2>Homepage</h2>
+    <div class="cont text-center">
+        <h1 class="mb-4">Expense Tracker</h1>
+        <div class="btn-group" role="group" aria-label="Filter Expenses">
+            <a href="/category" class="btn btn-secondary">All Expenses</a>
+            <a href="/category/food" class="btn btn-secondary">Food </a>
+            <a href="/category/utilities" class="btn btn-secondary">Utilities </a>
+            <a href="/category/transportation" class="btn btn-secondary">Transportation </a>
+            <a href="/category/entertainment" class="btn btn-secondary">Entertainment</a>
+            <a href="/category/others" class="btn btn-secondary">Others</a>
+        </div>
     </div>
+    <div class="expenses">
+        <div class="cont">
+
+            <% expense_array.forEach((expense_object)=>{ %>
+                <div class="expense">
+                    <div class="expense_name">
+                        <h2>
+                            <%= expense_object.name %>
+                        </h2>
+                    </div>
+                    <div class="expense_amount">
+                        <p>
+                            <%= expense_object.amount %>
+                        </p>
+                    </div>
+                    <form>
+                        <button><i class="fa-solid fa-trash"></i></button>
+                    </form>
+                </div>
+                <% }) %>
+        </div>
+    </div>
+
+
+
+
 
     <%-include("Footer.ejs")-%>

@@ -52,18 +52,20 @@ const userSchema = new mongoose.Schema({
         required: true,
     }
 })
-const blogSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        minLength: 100,
-        unique: true
 
-    },
-    content: {
+const expenseSchema = new mongoose.Schema({
+    name: {
         type: String,
         required: true,
-        minLength: 200
+        minLength: 3
+    },
+
+    amount: {
+        type: Number,
+        required: true
+    }, category: {
+        type: String,
+        required: true
 
     }
 })
@@ -72,7 +74,7 @@ const blogSchema = new mongoose.Schema({
 
 //models
 const User = mongoose.model("user", userSchema)
-const Blog = mongoose.model("blog", blogSchema)
+const Expense = mongoose.model("expense", expenseSchema)
 //======
 
 
@@ -97,9 +99,27 @@ const isLoggedIn = (req, res, next) => {
 
 //routues
 app.get("/", isLoggedIn, (req, res) => {
-    res.render("dashboard.ejs")
+    let arranged_expenses;
+    //res.render("dashboard.ejs")
+    Expense.find({})
+        .then((foundExpense) => {
+
+            arranged_expenses = foundExpense.reverse()
+
+            res.render("dashboard.ejs", {
+                expense_array: arranged_expenses
+            })
+
+        })
+
+        .catch((error) => {
+            console.log(error);
+
+        })
+
 
 })
+
 
 app.get("/signup", (req, res) => {
     res.render("signup.ejs")
@@ -190,45 +210,56 @@ app.get("/logout", (req, res) => {
 
 })
 
+app.get("/addExpense", (req, res) => {
+    res.render("addExpense")
+})
 
-app.get("/compose", isLoggedIn, (req, res) => {
-    res.render("compose.ejs")
+app.post("/addExpense", (req, res) => {
+    console.log(req.body);
+    var name = req.body.name
+    var amount = req.body.amount
+    var category = req.body.category
+
+    const expense = new Expense({
+        name: name,
+        amount: amount,
+        category: category
+    })
+    expense.save()
+        .then((expense) => {
+            console.log("added successfully =>", expense);
+            res.redirect("/")
+        })
+        .catch((error) => {
+            res.render("404.ejs")
+
+        })
+
 
 })
 
-app.post("/compose", (req, res) => {
-    var title = req.body.title
-    var content = req.body.content
 
-    const blogItem = new Blog({
-        title: title,
-        content: content
-    })
+// category route
+app.get("/category/:category?", (req, res) => {
+    const selected_category = req.params.category
 
-    blogItem.save()
-        .then(() => {
-            console.log("blog added successfully");
-            console.log(blogItem);
-            res.redirect("/blogs")
+    // define the filter based on weather a category is provided
+    const filter = selected_category ? { category: selected_category } : {}
 
+
+
+
+    Expense.find(filter) // {} / {category : selected_category}
+        .then((foundExpenses) => {
+            console.log("found expenses =>", foundExpenses);
+            res.render("dashboard.ejs", {
+                expense_array: foundExpenses
+            })
         })
         .catch((err) => {
             console.log(err);
         })
-})
-
-app.get("/blogs", isLoggedIn, (req, res) => {
-    Blog.find({})
-        .then((foundBlogs) => {
-            console.log(foundBlogs);
-            res.render("blogs.ejs", {
-                allblogs: foundBlogs
-            });
-
-        })
-        .catch((error) => {
-            console.log(error);
-
-        })
 
 })
+
+
